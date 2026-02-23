@@ -1,6 +1,6 @@
 package com.bank.transfer.app.dto;
 
-import com.bank.transfer.enums.TransactionStatus;
+import com.bank.transfer.app.enums.TransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
