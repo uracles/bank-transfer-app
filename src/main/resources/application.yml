@@ -1,0 +1,51 @@
+server:
+  port: 2026
+
+spring:
+  application:
+    name: bank-transfer-app
+  datasource:
+    url: jdbc:h2:mem:bankdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.bank.transfer: INFO
+    org.springframework: WARN
+
+# ShedLock config
+shedlock:
+  defaults:
+    lock-at-most-for: PT30M
+    lock-at-least-for: PT5M
+
+# App config
+app:
+  transfer:
+    # Max fee cap in naira/currency unit
+    fee-cap: 100.0
+    fee-rate: 0.005
+    commission-rate: 0.20
+  scheduler:
+    commission-cron: "0 0 1 * * *"    # 1:00 AM daily
+    summary-cron: "0 30 1 * * *"      # 1:30 AM daily
