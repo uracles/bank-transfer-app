@@ -1,4 +1,4 @@
-package com.bank.transfer.app.dto;
+package com.bank.transfer.app.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

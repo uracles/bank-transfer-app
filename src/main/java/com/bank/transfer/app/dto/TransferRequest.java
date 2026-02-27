@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransferRequest {
-
     @NotBlank(message = "Source account number is required")
     @Size(min = 10, max = 20, message = "Account number must be between 10 and 20 characters")
     private String sourceAccountNumber;

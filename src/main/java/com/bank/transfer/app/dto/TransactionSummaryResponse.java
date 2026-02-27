@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionSummaryResponse {
-
     private LocalDate summaryDate;
     private Long totalTransactions;
     private Long successfulTransactions;

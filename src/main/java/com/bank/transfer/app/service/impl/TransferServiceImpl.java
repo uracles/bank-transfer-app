@@ -16,8 +16,10 @@ import com.bank.transfer.app.repository.TransactionRepository;
 import com.bank.transfer.app.repository.TransactionSpecification;
 import com.bank.transfer.app.repository.TransactionSummaryRepository;
 import com.bank.transfer.app.service.FeeCalculationService;
-import com.bank.transfer.app.service.ReferenceGeneratorService;
 import com.bank.transfer.app.service.TransferService;
+import com.bank.transfer.app.util.AppUtil;
+import com.bank.transfer.app.util.PagedResponse;
+import com.bank.transfer.app.util.ReferenceGeneratorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,7 +45,6 @@ public class TransferServiceImpl implements TransferService {
     private final AccountRepository accountRepository;
     private final TransactionSummaryRepository summaryRepository;
     private final FeeCalculationService feeCalculationService;
-    private final ReferenceGeneratorService referenceGeneratorService;
     private final TransactionMapper transactionMapper;
 
     @Override
@@ -50,7 +52,7 @@ public class TransferServiceImpl implements TransferService {
     public TransferResponse processTransfer(TransferRequest request) {
         validateTransferRequest(request);
 
-        String reference = referenceGeneratorService.generate();
+        String reference = ReferenceGeneratorUtil.generate();
         BigDecimal fee = feeCalculationService.calculateTransactionFee(request.getAmount());
         BigDecimal billedAmount = request.getAmount().add(fee);
 
@@ -132,11 +134,17 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TransferResponse> getTransactions(TransactionFilterRequest filter) {
-        Pageable pageable = PageRequest.of(
-                filter.getPage(),
-                Math.min(filter.getSize(), 100),
-                Sort.by(Sort.Direction.DESC, "createdAt"));
+//    PagedResponse<List<RequestResponse>> getRequestsByStatus(Status status, Integer page, Integer pageSize) {
+    public PagedResponse<List<TransferResponse>> getTransactions(TransactionFilterRequest filter, Integer page, Integer pageSize) {
+
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+//        Page<Request> requestPage = requestRepository.findByStatus(status, pageable);
+
+
+//        Pageable pageable = PageRequest.of(
+//                filter.getPage(),
+//                Math.min(filter.getSize(), 100),
+//                Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Specification<Transaction> spec = Specification
                 .where(TransactionSpecification.hasStatus(filter.getStatus()))
@@ -144,8 +152,34 @@ public class TransferServiceImpl implements TransferService {
                 .and(TransactionSpecification.createdAfter(filter.getStartDate()))
                 .and(TransactionSpecification.createdBefore(filter.getEndDate()));
 
-        return transactionRepository.findAll(spec, pageable)
-                .map(transactionMapper::toTransferResponse);
+//        return transactionRepository.findAll(spec, pageable)
+//                .map(transactionMapper::toTransferResponse);
+
+        Page<Transaction> transactionPage = transactionRepository.findAll(spec, pageable);
+
+        List<TransferResponse> responses = transactionPage.getContent().stream()
+                .map(this::mapToTransferResponse)
+//                .map(transactionMapper::toTransferResponse);
+                .collect(Collectors.toList());
+
+        return AppUtil.buildPagedResponse(page, pageSize, transactionPage, responses);
+    }
+
+    public TransferResponse mapToTransferResponse(Transaction tx) {
+        return TransferResponse.builder()
+                .transactionReference(tx.getTransactionReference())
+                .amount(tx.getAmount())
+                .transactionFee(tx.getTransactionFee())
+                .billedAmount(tx.getBilledAmount())
+                .description(tx.getDescription())
+                .sourceAccountNumber(tx.getSourceAccountNumber())
+                .destinationAccountNumber(tx.getDestinationAccountNumber())
+                .status(tx.getStatus())
+                .statusMessage(tx.getStatusMessage())
+                .commissionWorthy(tx.getCommissionWorthy())
+                .commission(tx.getCommission())
+                .createdAt(tx.getCreatedAt())
+                .build();
     }
 
     @Override
@@ -172,7 +206,6 @@ public class TransferServiceImpl implements TransferService {
             transactionRepository.save(tx);
             processed++;
         }
-
         log.info("Commission processing complete. Processed {} transactions", processed);
     }
 

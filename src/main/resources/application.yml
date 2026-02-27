@@ -4,21 +4,22 @@ server:
 spring:
   application:
     name: bank-transfer-app
-  datasource:
-    url: jdbc:h2:mem:bankdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: false
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  config:
+    import: optional:file:.env[.properties]
 
+  datasource:
+    url: jdbc:postgresql://pg-bankdb-dotmfb-shaibumiracle7-231b.d.aivencloud.com:28238/defaultdb?sslmode=require
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
 management:
   endpoints:
     web:
@@ -33,19 +34,18 @@ logging:
     com.bank.transfer: INFO
     org.springframework: WARN
 
-# ShedLock config
 shedlock:
   defaults:
     lock-at-most-for: PT30M
     lock-at-least-for: PT5M
 
-# App config
 app:
   transfer:
-    # Max fee cap in naira/currency unit
     fee-cap: 100.0
     fee-rate: 0.005
     commission-rate: 0.20
   scheduler:
-    commission-cron: "0 0 1 * * *"    # 1:00 AM daily
-    summary-cron: "0 30 1 * * *"      # 1:30 AM daily
+#    commission-cron: "0 0 1 * * *"
+#    summary-cron: "0 30 1 * * *"
+    commission-cron: "0 */2 * * * *"
+    summary-cron: "0 */2 * * * *"

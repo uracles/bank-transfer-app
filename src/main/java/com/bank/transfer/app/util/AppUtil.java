@@ -89,8 +89,7 @@ public class AppUtil {
     public static <T> PagedResponse<T> buildPagedResponse(int page, int size, Page<?> result, T content) {
 
         return PagedResponse.<T>builder()
-                .flag(true)
-                .code("00")
+                .success(true)
                 .message(String.format("%s Record(s) Found", result.getTotalElements()))
                 .data(content)
                 .currentPage(page)
@@ -175,19 +174,6 @@ public class AppUtil {
         return phoneNo.replace(toMask, "*".repeat(toMask.length()));
     }
 
-    public static String convertMultipartFileToBase64(MultipartFile file) {
-        try {
-            String contentType = file.getContentType();
-            byte[] imageBytes = file.getBytes();
-            String base64 = Base64.getEncoder().encodeToString(imageBytes);
-            String fullBase64 = String.format("data:%s;base64,%s", contentType, base64);
-            log.info("File :: {}, size: {}, base64Length: {}", file.getName(), file.getSize(), base64.length());
-            return fullBase64;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public static String generateRandomNumeric(int length) {
         if (length < 1) {
             throw new IllegalArgumentException("Length must be greater than 0");
@@ -267,26 +253,6 @@ public class AppUtil {
             count++;
         }
         return (addCurr ? "₦" : "") + result + "." + formatted[1];
-    }
-
-    public static String convertFileToBase64(String name) {
-        try {
-            ClassPathResource resource = new ClassPathResource("static/" + name);
-            return Base64.getEncoder().encodeToString(resource.getContentAsByteArray());
-        } catch (IOException e) {
-            log.error("Could not add Inline attachments");
-            return "";
-        }
-    }
-
-    public static String generateSecurityRequestId() {
-        String time = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("HHmmss"));
-
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        char random = chars.charAt(new Random().nextInt(chars.length()));
-
-        return "PBS" + time + random;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.bank.transfer.app.controller;
 
-import com.bank.transfer.app.dto.ApiResponse;
+import com.bank.transfer.app.util.ApiResponse;
 import com.bank.transfer.app.dto.TransactionSummaryResponse;
 import com.bank.transfer.app.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;

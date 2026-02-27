@@ -1,6 +1,6 @@
 package com.bank.transfer.app.exception;
 
-import com.bank.transfer.app.dto.ApiResponse;
+import com.bank.transfer.app.util.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

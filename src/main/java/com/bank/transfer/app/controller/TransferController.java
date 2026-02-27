@@ -1,10 +1,11 @@
 package com.bank.transfer.app.controller;
 
-import com.bank.transfer.app.dto.ApiResponse;
+import com.bank.transfer.app.util.ApiResponse;
 import com.bank.transfer.app.dto.TransactionFilterRequest;
 import com.bank.transfer.app.dto.TransferRequest;
 import com.bank.transfer.app.dto.TransferResponse;
 import com.bank.transfer.app.service.TransferService;
+import com.bank.transfer.app.util.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/transfers")
@@ -24,21 +27,20 @@ public class TransferController {
 
     private final TransferService transferService;
 
-    @PostMapping
+    @PostMapping("/between-accounts")
     @Operation(summary = "Initiate a money transfer between two accounts")
     public ResponseEntity<ApiResponse<TransferResponse>> transfer(@Valid @RequestBody TransferRequest request) {
-        log.info("Transfer request received: {} -> {}, amount: {}",
-                request.getSourceAccountNumber(), request.getDestinationAccountNumber(), request.getAmount());
         TransferResponse response = transferService.processTransfer(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Transfer processed", response));
     }
 
-    @GetMapping
+    @GetMapping("/retrieve/transactions")
     @Operation(summary = "Retrieve paginated list of transactions with optional filters")
-    public ResponseEntity<ApiResponse<Page<TransferResponse>>> getTransactions(
+    public PagedResponse<List<TransferResponse>> getTransactions(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "50") Integer pageSize,
             @ModelAttribute TransactionFilterRequest filter) {
-        Page<TransferResponse> transactions = transferService.getTransactions(filter);
-        return ResponseEntity.ok(ApiResponse.success(transactions));
+        return transferService.getTransactions(filter, page, pageSize);
     }
 }
