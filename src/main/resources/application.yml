@@ -45,7 +45,5 @@ app:
     fee-rate: 0.005
     commission-rate: 0.20
   scheduler:
-#    commission-cron: "0 0 1 * * *"
-#    summary-cron: "0 30 1 * * *"
-    commission-cron: "0 */2 * * * *"
-    summary-cron: "0 */2 * * * *"
+    commission-cron: "0 0 1 * * *"
+    summary-cron: "0 30 1 * * *"
