@@ -21,4 +21,6 @@ public interface TransferService {
     void processCommissions();
 
     void generateDailySummary(LocalDate date);
+
+    TransactionSummaryResponse generateDailySummaryAndFetch(LocalDate date);
 }
