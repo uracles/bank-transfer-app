@@ -216,17 +216,3 @@ POST /api/v1/summaries/generate?date=2024-01-19
 ShedLock uses the PostgreSQL datasource to ensure scheduled jobs run on **exactly one pod** in a multi-instance deployment. The `shedlock` table is auto-created on startup.
 
 ---
-
-## Seeded Test Accounts
-
-These accounts are auto-created on first startup via `DataInitializer`:
-
-| Account Number | Name | Balance |
-|---|---|---|
-| `0123456789` | Alice Johnson | ₦500,000 |
-| `0987654321` | Bob Smith | ₦250,000 |
-| `1122334455` | Carol White | ₦1,000,000 |
-| `5566778899` | David Brown | ₦50,000 |
-| `9988776655` | Eve Davis | ₦5,000 |
-
----
